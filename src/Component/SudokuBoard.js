@@ -50,7 +50,7 @@ function SudokuBoard({
                                 {row.map((cell, cellIndex) => {
 
                                     const border = cellIndex === 0 ? "border-l-2" : cellIndex % 3 === 2 ? "border-r-2" : "";
-                                    const isInitial = initialBoard[rowIndex][cellIndex] !== 0
+                                    const isInitial = initialBoard?.[rowIndex]?.[cellIndex] !== 0
                                     const isRelated = selectedCell && (
                                         selectedCell.row === rowIndex || 
                                         selectedCell.col === cellIndex ||
