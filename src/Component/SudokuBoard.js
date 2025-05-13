@@ -5,13 +5,43 @@ import SudokuCell from "./SudokuCell";
 
 
 
-function SudokuBoard({ board, onCellClick }) {
+function SudokuBoard({
+    board,
+    initialBoard, updateBoard,
+    selectedCell,
+    setSelectedCell,
+    onCellClick
+}) {
+
+    const [selectedNum, setSelectedNum] = useState(null);
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedCell, board]);
+
+    const handleKeyDown = (e) => {
+        if (!selectedCell) return;
+        const { row, col } = selectedCell;
+        const key = e.key;
+        if (/^[1-9]$/.test(key)) {
+            updateBoard(row, col, parseInt(key));
+        }
+    }
+
+
+    const handleCellClick = (row, col) => {
+        setSelectedCell({ row: row, col: col })
+        setSelectedNum(board[row][col])
+    }
+
+    const isSameBox = (row1, col1, row2, col2) => Math.floor(row1 / 3) === Math.floor(row2 / 3) && Math.floor(col1 / 3) === Math.floor(col2 / 3);
 
 
     return (
         <>
             <div className="">
-                <div className="">
+                <div className="" onKeyDown={(e) => handleKeyDown(e)}>
                     {board.map((row, rowIndex) => {
                         const border = rowIndex === 0 ? "border-t-2" : rowIndex % 3 === 2 ? "border-b-2" : "";
 
@@ -19,8 +49,13 @@ function SudokuBoard({ board, onCellClick }) {
                             <div key={rowIndex} className={`flex ${border}`}>
                                 {row.map((cell, cellIndex) => {
 
-                                    const border = cellIndex  === 0 ? "border-l-2" : cellIndex % 3 === 2 ? "border-r-2" : "";
-
+                                    const border = cellIndex === 0 ? "border-l-2" : cellIndex % 3 === 2 ? "border-r-2" : "";
+                                    const isInitial = initialBoard[rowIndex][cellIndex] !== 0
+                                    const isRelated = selectedCell && (
+                                        selectedCell.row === rowIndex || 
+                                        selectedCell.col === cellIndex ||
+                                        isSameBox(rowIndex, cellIndex, selectedCell.row, selectedCell.col)
+                                    )
                                     return (
                                         <div key={cellIndex} className={`flex ${border}`}>
                                             <SudokuCell
@@ -28,7 +63,11 @@ function SudokuBoard({ board, onCellClick }) {
                                                 value={cell}
                                                 rowIndex={rowIndex}
                                                 cellIndex={cellIndex}
-                                                onCellClick={onCellClick}
+                                                isInitial={isInitial}
+                                                isRelated={isRelated}
+                                                selectedNum={selectedNum}
+                                                isSelected={selectedCell.row === rowIndex && selectedCell.col === cellIndex}
+                                                onCellClick={() => handleCellClick(rowIndex, cellIndex)}
                                             />
                                         </div>
 
