@@ -6,8 +6,6 @@ export default function generateSudoku(difficulty) {
 
 }
 
-
-
 export function createSolvedBoard() {
     const board = Array(9)
         .fill(0)

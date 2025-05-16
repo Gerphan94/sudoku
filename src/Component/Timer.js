@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { use } from "react";
 import { FaCirclePause, FaCirclePlay } from "react-icons/fa6";
+import { FcClock } from "react-icons/fc";
 
-function Timer({ isPaused, setIsPaused }) {
+ function TimerComponent ({isTimerRunning}) {
 
     const [seconds, setSeconds] = useState(0);
 
     useEffect(() => {
         let interval = null;
-        if (!isPaused) {
+        if (isTimerRunning) {
             interval = setInterval(() => {
                 setSeconds(seconds => seconds + 1);
             }, 1000);
@@ -15,8 +17,7 @@ function Timer({ isPaused, setIsPaused }) {
             clearInterval(interval);
         }
         return () => clearInterval(interval);
-    }, [isPaused]);
-
+    }, [isTimerRunning]);
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -28,18 +29,16 @@ function Timer({ isPaused, setIsPaused }) {
 
         <>
             <div className="px-2 flex gap-4 items-center border-b">
-                <div className="text-left">
-                    <div className="text-sm">Time</div>
-                    <div className="text-2xl">{formatTime(seconds)}</div>
+                <div className="flex gap-2 items-center text-xl">
+                    <div className=""><FcClock /></div>
+                    <div className="">{formatTime(seconds)}</div>
                 </div>
-                <button className="size-full p-3" onClick={() => setIsPaused(!isPaused)}>
+                {/* <button className="size-full p-3" onClick={() => setIsPaused(!isPaused)}>
                     {isPaused ? <FaCirclePlay className="size-10" /> : <FaCirclePause className="size-10" />}
-                </button>
+                </button> */}
             </div>
-
-
         </>
     )
 }
 
-export default Timer;
+export const Timer = React.memo(TimerComponent)
