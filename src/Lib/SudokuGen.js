@@ -64,7 +64,10 @@ const createPuzzle = (solution, difficulty) => {
 
     let cellsToRemove = 0
 
-    if (difficulty === 'easy') {
+
+    if (difficulty === 'veryeasy') {
+        cellsToRemove = 25
+    } else if (difficulty === 'easy') {
         cellsToRemove = 35
     } else if (difficulty === 'medium') {
         cellsToRemove = 45
@@ -72,6 +75,8 @@ const createPuzzle = (solution, difficulty) => {
         cellsToRemove = 60
     } else if (difficulty === 'veryhard') {
         cellsToRemove = 65
+    } else if (difficulty === 'extremehard') {
+        cellsToRemove = 70
     }
 
     const positions = []

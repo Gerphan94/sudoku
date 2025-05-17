@@ -5,7 +5,7 @@ import { Timer } from "./Timer";
 import { CiPause1, CiPlay1 } from "react-icons/ci";
 import { GoLightBulb } from "react-icons/go";
 import { LuPencilLine } from "react-icons/lu";
-
+import WinGame from "./WinGame";
 
 function Sudoku() {
 
@@ -14,19 +14,19 @@ function Sudoku() {
 
     const [difficulty, setDifficulty] = useState('medium')
     const [isCheckDuplicate, setIsCheckDuplicate] = useState(true)
-    const [isCompleted, setIsCompleted] = useState(false)
     const [board, setBoard] = useState([])
     const [solution, setSolution] = useState([])
     const [viewBoard, setViewBoard] = useState([])
     const [initialBoard, setInitialBoard] = useState([])
+    // const [isGameOver, setIsGameOver] = useState(false);
+    const [isCompleted, setIsCompleted] = useState(true);
     const [isTimerRunning, setIsTimerRunning] = useState(true);
 
     const [nCheck, setNCheck] = useState(3)
 
     const [selectedCell, setSelectedCell] = useState({ row: null, col: null });
     const [selectedNumPad, setSelectedNumPad] = useState(0);
-    const [seconds, setSeconds] = useState(0);
-    const [showBox, setShowBox] = useState(false);
+
 
     const [hoveredCell, setHoveredCell] = useState({ row: null, col: null });
     const handleMouseEnter = (row, col) => {
@@ -36,13 +36,13 @@ function Sudoku() {
         setHoveredCell({ row: null, col: null });
     };
 
-
-
     const levels = [
+        { value: 'veryeasy', label: 'Very Easy' },
         { value: 'easy', label: 'Easy' },
         { value: 'medium', label: 'Medium' },
         { value: 'hard', label: 'Hard' },
         { value: 'veryhard', label: 'Very Hard' },
+        { value: 'extremehard', label: 'Extreme Hard' },
     ]
 
     // useEffect(() => {
@@ -63,7 +63,7 @@ function Sudoku() {
             setViewBoard(JSON.parse(JSON.stringify(puzzle)))
             setInitialBoard(JSON.parse(JSON.stringify(puzzle)))
             setSolution(solution)
-            setSeconds(0);
+
         }
     }
 
@@ -143,6 +143,7 @@ function Sudoku() {
 
                     <div className="md:flex">
                         <div className="">
+
                             <SudokuBoard
                                 board={viewBoard}
                                 selectedCell={selectedCell}
@@ -154,7 +155,9 @@ function Sudoku() {
                                 isCheckDuplicate={isCheckDuplicate}
                                 selectedNumPad={selectedNumPad}
                                 setSelectedNumPad={setSelectedNumPad}
+                                isCompleted={isCompleted}
                             />
+
                         </div>
                         <div className="flex px-4 flex-col justify-between">
                             <div>
@@ -162,7 +165,6 @@ function Sudoku() {
                                     isTimerRunning={isTimerRunning}
                                 />
                             </div>
-
                             <div>
                                 <button
                                     className="border rounded-full p-2"
@@ -178,9 +180,7 @@ function Sudoku() {
                                 <button className="border rounded-full p-2 ml-2">
                                     <LuPencilLine className="size-6" />
                                 </button>
-
                             </div>
-
                             <div className=" md:grid grid-cols-3 gap-2 hidden select-none py-2">
                                 {Array.from({ length: 9 }, (_, i) => i + 1).map((num) => (
                                     <button
@@ -191,7 +191,7 @@ function Sudoku() {
                                     >{num}</button>
                                 ))}
                                 <button className="size-14 rounded-md border p-2"
-                                onClick={() => handleClickNumPad(0)}
+                                    onClick={() => handleClickNumPad(0)}
                                 >X</button>
 
                             </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import SudokuCell from "./SudokuCell";
-
+import WinGame from "./WinGame";
 import { FaCirclePause, FaCirclePlay } from "react-icons/fa6";
 
 function SudokuBoard({
@@ -11,7 +11,8 @@ function SudokuBoard({
     setSelectedCell,
     isTimerRunning, setIsTimerRunning,
     isCheckDuplicate,
-    selectedNumPad, setSelectedNumPad
+    selectedNumPad, setSelectedNumPad,
+    isCompleted
 
 }) {
     console.log('board---', board)
@@ -43,7 +44,7 @@ function SudokuBoard({
 
     const isSameBox = (row1, col1, row2, col2) => Math.floor(row1 / 3) === Math.floor(row2 / 3) && Math.floor(col1 / 3) === Math.floor(col2 / 3);
 
-    function checkDuplicate( row, col, value) {
+    function checkDuplicate(row, col, value) {
         if (isCheckDuplicate === false) return false
         // Check row
         if (initialBoard[row][col] === value) return false;
@@ -79,7 +80,6 @@ function SudokuBoard({
                         return (
                             <div key={rowIndex} className={`flex ${border}`}>
                                 {row.map((cell, cellIndex) => {
-
                                     const border = cellIndex === 0 ? "border-l-2" : cellIndex % 3 === 2 ? "border-r-2" : "";
                                     const isInitial = initialBoard?.[rowIndex]?.[cellIndex] !== 0
                                     const isRelated = selectedCell && selectedCell.row !== null && selectedCell.col !== null && (
@@ -113,7 +113,9 @@ function SudokuBoard({
                     <div className="w-full h-full top-0 left-0 absolute cursor-pointer"
                         onClick={() => setIsTimerRunning(true)}>
                         <FaCirclePlay className="size-14 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#2973B2]" />
-                    </div>}
+                    </div>
+                }
+                {isCompleted && <WinGame board={board} />}
 
             </div>
 
