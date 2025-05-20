@@ -3,9 +3,16 @@ import { use } from "react";
 import { FaCirclePause, FaCirclePlay } from "react-icons/fa6";
 import { FcClock } from "react-icons/fc";
 
- function TimerComponent ({isTimerRunning}) {
+ function TimerComponent ({ isTimerRunning, setTotalTime, isCorrect }) {
 
     const [seconds, setSeconds] = useState(0);
+
+    useEffect(() => {
+        if (isCorrect) {
+            setTotalTime(formatTime(seconds));
+            setSeconds(0);
+        }
+    }, [isCorrect]);
 
     useEffect(() => {
         let interval = null;

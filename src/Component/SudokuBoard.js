@@ -12,7 +12,8 @@ function SudokuBoard({
     isTimerRunning, setIsTimerRunning,
     isCheckDuplicate,
     selectedNumPad, setSelectedNumPad,
-    isCompleted
+    isCompleted,
+    selectedNum, setSelectedNum
 
 }) {
     console.log('board---', board)
@@ -34,12 +35,25 @@ function SudokuBoard({
     }
 
     const handleCellClick = (row, col) => {
-        if (selectedNumPad !== 0) {
-            updateBoard(row, col, selectedNumPad);
+        const cellValue = board[row][col];
+        if (cellValue === selectedNum) {
+            setSelectedNum(0);
+            setSelectedCell({ row: null, col: null });
+            setSelectedNumPad(0);
+            return;
+        }
+        if (cellValue !== 0) {
+            setSelectedNumPad(cellValue);
         }
         setSelectedCell({ row: row, col: col })
-        setSelectedNumPad(board[row][col])
-
+        setSelectedNum(board[row][col]);
+        if (selectedNumPad !== 0) {
+            updateBoard(row, col, selectedNumPad);
+            setSelectedNumPad(selectedNumPad);
+        } else {
+            setSelectedNumPad(0);
+        }
+        
     }
 
     const isSameBox = (row1, col1, row2, col2) => Math.floor(row1 / 3) === Math.floor(row2 / 3) && Math.floor(col1 / 3) === Math.floor(col2 / 3);
@@ -98,7 +112,7 @@ function SudokuBoard({
                                                 isInitial={isInitial}
                                                 isRelated={isRelated}
                                                 isDuplicate={checkDuplicate(rowIndex, cellIndex, cell)}
-                                                selectedNum={selectedNumPad}
+                                                selectedNum={selectedNum}
                                                 isSelected={selectedCell.row === rowIndex && selectedCell.col === cellIndex}
                                                 onCellClick={() => handleCellClick(rowIndex, cellIndex)}
                                             />
@@ -115,7 +129,7 @@ function SudokuBoard({
                         <FaCirclePlay className="size-14 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#2973B2]" />
                     </div>
                 }
-                {isCompleted && <WinGame board={board} />}
+                {/* {isCompleted && <WinGame board={board} />} */}
 
             </div>
 

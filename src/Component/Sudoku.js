@@ -11,6 +11,8 @@ function Sudoku() {
 
     // const [puzzle, solution] = generateSudoku('easy')
     console.log('welcome to sudoku')
+    //   console.trace();
+
 
     const [difficulty, setDifficulty] = useState('medium')
     const [isCheckDuplicate, setIsCheckDuplicate] = useState(true)
@@ -18,14 +20,18 @@ function Sudoku() {
     const [solution, setSolution] = useState([])
     const [viewBoard, setViewBoard] = useState([])
     const [initialBoard, setInitialBoard] = useState([])
-    // const [isGameOver, setIsGameOver] = useState(false);
     const [isCompleted, setIsCompleted] = useState(true);
+    const [isCorrect, setIsCorrect] = useState(false);
     const [isTimerRunning, setIsTimerRunning] = useState(true);
+    const [totalTime, setTotalTime] = useState('00:00');
+    const [useCount, setUseCount] = useState([]);
+
 
     const [nCheck, setNCheck] = useState(3)
 
     const [selectedCell, setSelectedCell] = useState({ row: null, col: null });
     const [selectedNumPad, setSelectedNumPad] = useState(0);
+    const [selectedNum, setSelectedNum] = useState(0);
 
 
     const [hoveredCell, setHoveredCell] = useState({ row: null, col: null });
@@ -53,8 +59,14 @@ function Sudoku() {
     // }, []);
 
     useEffect(() => {
-        newGame(difficulty)
-    }, [difficulty])
+        if (difficulty) {
+            try {
+                newGame(difficulty);
+            } catch (error) {
+                console.error("Error starting new game:", error);
+            }
+        }
+    }, [difficulty]);
 
     const newGame = (level) => {
         const { puzzle, solution } = generateSudoku(level)
@@ -63,11 +75,16 @@ function Sudoku() {
             setViewBoard(JSON.parse(JSON.stringify(puzzle)))
             setInitialBoard(JSON.parse(JSON.stringify(puzzle)))
             setSolution(solution)
-
+            setIsCompleted(false);
+            setIsCorrect(false);
+            setIsTimerRunning(true);
+            setSelectedCell({ row: null, col: null });
+            setSelectedNumPad(0);
+            setTotalTime('00:00');
+            setUseCount(availableNumber(puzzle))
+            console.log('------------------', availableNumber(puzzle))
         }
     }
-
-
 
     const changeDifficulty = (value) => {
         setDifficulty(value)
@@ -86,6 +103,21 @@ function Sudoku() {
         changeDifficulty(value);
     }
 
+    const availableNumber = (board) => {
+        const counts = Array(10).fill(0); // index 1–9 used
+
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                const cell = board[i][j];
+                if (cell >= 1 && cell <= 9) {
+                    counts[cell]++;
+                }
+            }
+        }
+        console.log('counts', counts)
+        return  counts.slice(1);
+    };
+
     const updateBoard = (row, col, value) => {
         console.log('updateBoard', updateBoard)
         if (initialBoard[row][col] !== 0) return;
@@ -94,6 +126,25 @@ function Sudoku() {
         newBoard[row][col] = value;
         setBoard(newBoard);
         setViewBoard(newBoard);
+        setUseCount(availableNumber(newBoard))
+
+        const iComplete = newBoard.every((row) => row.every((cell) => cell !== 0));
+        if (iComplete) {
+            setIsCompleted(true);
+            setIsCorrect(checkSolution());
+            setIsTimerRunning(false);
+        }
+
+    }
+    const checkSolution = () => {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] !== solution[row][col]) {
+                    return false;
+                }
+            }
+        }
+        return true
     }
 
     useEffect(() => {
@@ -103,28 +154,22 @@ function Sudoku() {
         } else {
             setViewBoard(board)
         }
-
     }, [isTimerRunning, board])
-
 
 
     const handleClickNumPad = (num) => {
         setSelectedNumPad(num)
+        setSelectedNum(num)
         setSelectedCell({ row: null, col: null })
     }
 
     // TIMER
 
-
-
-
-
-
     return (
         <>
 
             <div className="flex justify-center items-center w-screen h-screen select-none">
-                <div>
+                <div className="">
                     <div className="p-2  border-b text-left text-blue-900 text-4xl font-bold">
                         Sudoku
                     </div>
@@ -141,9 +186,19 @@ function Sudoku() {
                         </div>
                     </div>
 
-                    <div className="md:flex">
-                        <div className="">
 
+
+                    <div className="md:flex relative">
+                        {isCorrect &&
+                            <div className="absolute top-0 left-0 w-full h-full z-50">
+                                <WinGame
+                                    board={board}
+                                    totalTime={totalTime}
+                                    newGame={newGame} />
+                            </div>
+                        }
+
+                        <div className="z-40">
                             <SudokuBoard
                                 board={viewBoard}
                                 selectedCell={selectedCell}
@@ -156,6 +211,8 @@ function Sudoku() {
                                 selectedNumPad={selectedNumPad}
                                 setSelectedNumPad={setSelectedNumPad}
                                 isCompleted={isCompleted}
+                                selectedNum ={selectedNum}
+                                setSelectedNum ={setSelectedNum}
                             />
 
                         </div>
@@ -163,6 +220,8 @@ function Sudoku() {
                             <div>
                                 <Timer
                                     isTimerRunning={isTimerRunning}
+                                    isCorrect={isCorrect}
+                                    setTotalTime={setTotalTime}
                                 />
                             </div>
                             <div>
@@ -185,7 +244,8 @@ function Sudoku() {
                                 {Array.from({ length: 9 }, (_, i) => i + 1).map((num) => (
                                     <button
                                         key={num}
-                                        className={`size-14 rounded-md border select-none hover:scale-110 hover:font-bold ${selectedNumPad === num ? 'border-blue-600 text-blue-600 font-bold' : ''} `}
+                                        disabled={useCount[num-1] === 9}
+                                        className={`size-14 rounded-md border select-none hover:scale-110 hover:font-bold disabled:bg-gray-200 disabled:scale-100 disabled:cursor-not-allowed disabled:text-gray-400 ${selectedNumPad === num ? 'border-blue-600 text-blue-600 font-bold' : ''} `}
                                         onClick={() => handleClickNumPad(num)}
 
                                     >{num}</button>
@@ -193,12 +253,11 @@ function Sudoku() {
                                 <button className="size-14 rounded-md border p-2"
                                     onClick={() => handleClickNumPad(0)}
                                 >X</button>
-
                             </div>
                             <button className="border rounded-md p-2">New game</button>
                         </div>
-
                     </div>
+
 
                 </div>
             </div>

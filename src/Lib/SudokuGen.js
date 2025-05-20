@@ -66,7 +66,7 @@ const createPuzzle = (solution, difficulty) => {
 
 
     if (difficulty === 'veryeasy') {
-        cellsToRemove = 25
+        cellsToRemove = 2
     } else if (difficulty === 'easy') {
         cellsToRemove = 35
     } else if (difficulty === 'medium') {
